@@ -24,12 +24,12 @@ def solutions(m, nums):
     while i < n:
         while i < n and nums[i][0] <= start:
             end = max(end, nums[i][1])
-            i += 1
+            i += 1 # i가 커지면서 게속 찾도록
         answer += 1
         if end == m:
             return answer
         start = end # end!=m 이라면 start를 end로 바꿔서 이어지도록 설정
-        
+
     return answer
 
         
