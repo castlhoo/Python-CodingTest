@@ -27,7 +27,7 @@ def solutions(nums, k):
         left += 1
 
         minS = min(minS, score)
-    return total - minS
+    return total - minS # 남은 스코어 값에서 전체값 빼서 구하기
 
 print(solutions([2, 3, 7, 1, 2, 1, 5], 4))
 print(solutions([1, 2, 3, 5, 6, 7, 1, 3, 9], 5))
