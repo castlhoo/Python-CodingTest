@@ -1,68 +1,29 @@
--- Table: Person
+-- Write a query identifying the type of each record in the TRIANGLES table using its three side lengths. Output one of the following statements for each record in the table:
 
--- +-------------+---------+
--- | Column Name | Type    |
--- +-------------+---------+
--- | personId    | int     |
--- | lastName    | varchar |
--- | firstName   | varchar |
--- +-------------+---------+
--- personId is the primary key (column with unique values) for this table.
--- This table contains information about the ID of some persons and their first and last names.
- 
+-- Equilateral: It's a triangle with  sides of equal length.
+-- Isosceles: It's a triangle with  sides of equal length.
+-- Scalene: It's a triangle with  sides of differing lengths.
+-- Not A Triangle: The given values of A, B, and C don't form a triangle.
+-- Input Format
 
--- Table: Address
+-- The TRIANGLES table is described as follows:
 
--- +-------------+---------+
--- | Column Name | Type    |
--- +-------------+---------+
--- | addressId   | int     |
--- | personId    | int     |
--- | city        | varchar |
--- | state       | varchar |
--- +-------------+---------+
--- addressId is the primary key (column with unique values) for this table.
--- Each row of this table contains information about the city and state of one person with ID = PersonId.
- 
 
--- Write a solution to report the first name, last name, city, and state of each person in the Person table. If the address of a personId is not present in the Address table, report null instead.
 
--- Return the result table in any order.
+-- Each row in the table denotes the lengths of each of a triangle's three sides.
 
--- The result format is in the following example.
+-- Isosceles
+-- Equilateral
+-- Scalene
+-- Not A Triangle
 
- 
+SELECT
+    CASE
+        WHEN A + B <= C OR A + C <= B OR B + C <= A THEN 'Not A Triangle'
+        WHEN A = B AND B = C THEN 'Equilateral'
+        WHEN A = B OR B = C OR A = C THEN 'Isosceles'
+        ELSE 'Scalene'
+    END AS TriangleType
+FROM TRIANGLES;
 
--- Example 1:
-
--- Input: 
--- Person table:
--- +----------+----------+-----------+
--- | personId | lastName | firstName |
--- +----------+----------+-----------+
--- | 1        | Wang     | Allen     |
--- | 2        | Alice    | Bob       |
--- +----------+----------+-----------+
--- Address table:
--- +-----------+----------+---------------+------------+
--- | addressId | personId | city          | state      |
--- +-----------+----------+---------------+------------+
--- | 1         | 2        | New York City | New York   |
--- | 2         | 3        | Leetcode      | California |
--- +-----------+----------+---------------+------------+
--- Output: 
--- +-----------+----------+---------------+----------+
--- | firstName | lastName | city          | state    |
--- +-----------+----------+---------------+----------+
--- | Allen     | Wang     | Null          | Null     |
--- | Bob       | Alice    | New York City | New York |
--- +-----------+----------+---------------+----------+
--- Explanation: 
--- There is no address in the address table for the personId = 1 so we return null in their city and state.
--- addressId = 1 contains information about the address of personId = 2.
-
-# Write your MySQL query statement below
-SELECT firstName, lastName, city, state
-FROM Person
-LEFT OUTER JOIN Address
-ON Person.personId = Address.personId
+-- When use CASE sentences, need to use bigger classification first.
