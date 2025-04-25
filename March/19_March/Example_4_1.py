@@ -29,7 +29,7 @@ def solutions(nums):
                     break
             if flag == True:
                 answer += 1
-        return answer
+    return answer
 
 
 print(solutions([[10, 20, 50, 30, 20], [20, 30, 50, 70, 90], [10, 15, 25,

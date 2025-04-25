@@ -29,6 +29,7 @@ def solutions(stick):
             answer += 1
     return answer
 
+# 빠른 입력 처리
 input = sys.stdin.readline
 n = int(input())
 arr = [int(input()) for _ in range(n)]
