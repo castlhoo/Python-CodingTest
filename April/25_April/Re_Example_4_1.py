@@ -31,7 +31,7 @@ def solutions(nums):
                     break
 
             if flag == True:
-                answer += 1
+                answer + 1
     return answer
 
 
