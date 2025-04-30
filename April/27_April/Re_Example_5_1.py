@@ -12,21 +12,6 @@
 # • nums[i]는 i번재 사탕의 종류를 의미합니다. nums[i]값이 같으면 같은 종류의 사탕입니다.
 # • 1 <= nums[i] <= 1,000
 
-# nums = sorted([12, 23, 11, 3, 5, 23, 23, 23, 23, 23, 23, 23])
-# cnt = []
-# cnt.append(nums[0])
-# n = len(nums)//2
-
-# for i in range(n):
-#     if nums[i] != nums[i+1]:
-#         cnt.append(i)
-#     else:
-#         continue
-
-
-# print(sorted(nums))
-# print(cnt)
-
 def solutions(nums):
     cnt = 1
     nums .sort()
