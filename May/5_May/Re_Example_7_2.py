@@ -22,4 +22,6 @@ def solutions(nums, weight):
         mid = (left + right)//2
 
         if nums[mid] == weight:
+            return mid
+        elif nums[mid] < weight:
             return 
