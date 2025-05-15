@@ -14,24 +14,27 @@
 from collections import deque
 
 def BFS(home):
-    Q = deque
+    Q = deque()
     Q.append(1)
     L = 0
-    ch = [0] * 10001
+    ch= []*10001
     ch[0] = 1
 
     while Q:
         n = len(Q)
         for i in range(n):
-            x = Q.popleft()
-            if x == home:
+            v = Q.popleft()
+            if v == home:
                 return L
-
-            for nx in [i+1, i-1, i+5]:
-                if nx>=0 and nx<=10000 and ch[nx] == 0:
-                    Q.append(nx)
-                    ch[nx] = 1
+            
+            for nv in [n-1,n+1, n+5]:
+                if nv>=0 and nv<10000 and ch[nv] == 0:
+                    Q.append(nv)
+                    ch[nv] == 1
+                
         L += 1
+
+
 
 def solutions(home):
     answer = BFS(home)
