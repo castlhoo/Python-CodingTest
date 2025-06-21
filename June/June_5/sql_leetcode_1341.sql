@@ -1,52 +1,37 @@
--- 1341. Movie Rating
+-- 585. Investments in 2016
 -- Solved
 -- Medium
 -- Topics
 -- premium lock icon
 -- Companies
+-- Hint
 -- SQL Schema
 -- Pandas Schema
--- Table: Movies
+-- Table: Insurance
 
--- +---------------+---------+
--- | Column Name   | Type    |
--- +---------------+---------+
--- | movie_id      | int     |
--- | title         | varchar |
--- +---------------+---------+
--- movie_id is the primary key (column with unique values) for this table.
--- title is the name of the movie.
+-- +-------------+-------+
+-- | Column Name | Type  |
+-- +-------------+-------+
+-- | pid         | int   |
+-- | tiv_2015    | float |
+-- | tiv_2016    | float |
+-- | lat         | float |
+-- | lon         | float |
+-- +-------------+-------+
+-- pid is the primary key (column with unique values) for this table.
+-- Each row of this table contains information about one policy where:
+-- pid is the policyholder's policy ID.
+-- tiv_2015 is the total investment value in 2015 and tiv_2016 is the total investment value in 2016.
+-- lat is the latitude of the policy holder's city. It's guaranteed that lat is not NULL.
+-- lon is the longitude of the policy holder's city. It's guaranteed that lon is not NULL.
  
 
--- Table: Users
+-- Write a solution to report the sum of all total investment values in 2016 tiv_2016, for all policyholders who:
 
--- +---------------+---------+
--- | Column Name   | Type    |
--- +---------------+---------+
--- | user_id       | int     |
--- | name          | varchar |
--- +---------------+---------+
--- user_id is the primary key (column with unique values) for this table.
--- The column 'name' has unique values.
--- Table: MovieRating
+-- have the same tiv_2015 value as one or more other policyholders, and
+-- are not located in the same city as any other policyholder (i.e., the (lat, lon) attribute pairs must be unique).
+-- Round tiv_2016 to two decimal places.
 
--- +---------------+---------+
--- | Column Name   | Type    |
--- +---------------+---------+
--- | movie_id      | int     |
--- | user_id       | int     |
--- | rating        | int     |
--- | created_at    | date    |
--- +---------------+---------+
--- (movie_id, user_id) is the primary key (column with unique values) for this table.
--- This table contains the rating of a movie by a user in their review.
--- created_at is the user's review date. 
- 
-
--- Write a solution to:
-
--- Find the name of the user who has rated the greatest number of movies. In case of a tie, return the lexicographically smaller user name.
--- Find the movie name with the highest average rating in February 2020. In case of a tie, return the lexicographically smaller movie name.
 -- The result format is in the following example.
 
  
@@ -54,68 +39,40 @@
 -- Example 1:
 
 -- Input: 
--- Movies table:
--- +-------------+--------------+
--- | movie_id    |  title       |
--- +-------------+--------------+
--- | 1           | Avengers     |
--- | 2           | Frozen 2     |
--- | 3           | Joker        |
--- +-------------+--------------+
--- Users table:
--- +-------------+--------------+
--- | user_id     |  name        |
--- +-------------+--------------+
--- | 1           | Daniel       |
--- | 2           | Monica       |
--- | 3           | Maria        |
--- | 4           | James        |
--- +-------------+--------------+
--- MovieRating table:
--- +-------------+--------------+--------------+-------------+
--- | movie_id    | user_id      | rating       | created_at  |
--- +-------------+--------------+--------------+-------------+
--- | 1           | 1            | 3            | 2020-01-12  |
--- | 1           | 2            | 4            | 2020-02-11  |
--- | 1           | 3            | 2            | 2020-02-12  |
--- | 1           | 4            | 1            | 2020-01-01  |
--- | 2           | 1            | 5            | 2020-02-17  | 
--- | 2           | 2            | 2            | 2020-02-01  | 
--- | 2           | 3            | 2            | 2020-03-01  |
--- | 3           | 1            | 3            | 2020-02-22  | 
--- | 3           | 2            | 4            | 2020-02-25  | 
--- +-------------+--------------+--------------+-------------+
+-- Insurance table:
+-- +-----+----------+----------+-----+-----+
+-- | pid | tiv_2015 | tiv_2016 | lat | lon |
+-- +-----+----------+----------+-----+-----+
+-- | 1   | 10       | 5        | 10  | 10  |
+-- | 2   | 20       | 20       | 20  | 20  |
+-- | 3   | 10       | 30       | 20  | 20  |
+-- | 4   | 10       | 40       | 40  | 40  |
+-- +-----+----------+----------+-----+-----+
 -- Output: 
--- +--------------+
--- | results      |
--- +--------------+
--- | Daniel       |
--- | Frozen 2     |
--- +--------------+
+-- +----------+
+-- | tiv_2016 |
+-- +----------+
+-- | 45.00    |
+-- +----------+
 -- Explanation: 
--- Daniel and Monica have rated 3 movies ("Avengers", "Frozen 2" and "Joker") but Daniel is smaller lexicographically.
--- Frozen 2 and Joker have a rating average of 3.5 in February but Frozen 2 is smaller lexicographically.
+-- The first record in the table, like the last record, meets both of the two criteria.
+-- The tiv_2015 value 10 is the same as the third and fourth records, and its location is unique.
+
+-- The second record does not meet any of the two criteria. Its tiv_2015 is not like any other policyholders and its location is the same as the third record, which makes the third record fail, too.
+-- So, the result is the sum of tiv_2016 of the first and last record, which is 45.
 
 # Write your MySQL query statement below
-SELECT name as results
-FROM (        
-    SELECT u.name, COUNT(*) as rating_count
-    FROM users u
-    JOIN movierating mv ON u.user_id = mv.user_id
-    GROUP BY u.user_id, u.name
-    ORDER BY rating_count DESC, name ASC
-    LIMIT 1
-) t1
+SELECT ROUND(SUM(tiv_2016),2) AS tiv_2016
+FROM insurance
+WHERE tiv_2015 IN (
+    SELECT tiv_2015
+    FROM insurance
+    GROUP BY tiv_2015
+    HAVING COUNT(tiv_2015) >= 2
+) AND (lat, lon) IN (
+    SELECT lat, lon
+    FROM insurance
+    GROUP BY lat, lon
+    HAVING COUNT(*) = 1
+)
 
-UNION ALL
-
-SELECT title AS results
-FROM (
-    SELECT m.title, AVG(mv.rating) AS rating_avg
-    FROM movies m
-    JOIN movierating mv ON m.movie_id = mv.movie_id
-    WHERE YEAR(created_at) = 2020 AND MONTH(created_at) = 2
-    GROUP BY m.movie_id, m.title
-    ORDER BY rating_avg DESC, title ASC
-    LIMIT 1
-) t2
