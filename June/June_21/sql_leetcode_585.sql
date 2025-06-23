@@ -1,4 +1,4 @@
--- 602. Friend Requests II: Who Has the Most Friends
+-- 585. Investments in 2016
 -- Solved
 -- Medium
 -- Topics
@@ -7,22 +7,30 @@
 -- Hint
 -- SQL Schema
 -- Pandas Schema
--- Table: RequestAccepted
+-- Table: Insurance
 
--- +----------------+---------+
--- | Column Name    | Type    |
--- +----------------+---------+
--- | requester_id   | int     |
--- | accepter_id    | int     |
--- | accept_date    | date    |
--- +----------------+---------+
--- (requester_id, accepter_id) is the primary key (combination of columns with unique values) for this table.
--- This table contains the ID of the user who sent the request, the ID of the user who received the request, and the date when the request was accepted.
+-- +-------------+-------+
+-- | Column Name | Type  |
+-- +-------------+-------+
+-- | pid         | int   |
+-- | tiv_2015    | float |
+-- | tiv_2016    | float |
+-- | lat         | float |
+-- | lon         | float |
+-- +-------------+-------+
+-- pid is the primary key (column with unique values) for this table.
+-- Each row of this table contains information about one policy where:
+-- pid is the policyholder's policy ID.
+-- tiv_2015 is the total investment value in 2015 and tiv_2016 is the total investment value in 2016.
+-- lat is the latitude of the policy holder's city. It's guaranteed that lat is not NULL.
+-- lon is the longitude of the policy holder's city. It's guaranteed that lon is not NULL.
  
 
--- Write a solution to find the people who have the most friends and the most friends number.
+-- Write a solution to report the sum of all total investment values in 2016 tiv_2016, for all policyholders who:
 
--- The test cases are generated so that only one person has the most friends.
+-- have the same tiv_2015 value as one or more other policyholders, and
+-- are not located in the same city as any other policyholder (i.e., the (lat, lon) attribute pairs must be unique).
+-- Round tiv_2016 to two decimal places.
 
 -- The result format is in the following example.
 
@@ -31,47 +39,38 @@
 -- Example 1:
 
 -- Input: 
--- RequestAccepted table:
--- +--------------+-------------+-------------+
--- | requester_id | accepter_id | accept_date |
--- +--------------+-------------+-------------+
--- | 1            | 2           | 2016/06/03  |
--- | 1            | 3           | 2016/06/08  |
--- | 2            | 3           | 2016/06/08  |
--- | 3            | 4           | 2016/06/09  |
--- +--------------+-------------+-------------+
+-- Insurance table:
+-- +-----+----------+----------+-----+-----+
+-- | pid | tiv_2015 | tiv_2016 | lat | lon |
+-- +-----+----------+----------+-----+-----+
+-- | 1   | 10       | 5        | 10  | 10  |
+-- | 2   | 20       | 20       | 20  | 20  |
+-- | 3   | 10       | 30       | 20  | 20  |
+-- | 4   | 10       | 40       | 40  | 40  |
+-- +-----+----------+----------+-----+-----+
 -- Output: 
--- +----+-----+
--- | id | num |
--- +----+-----+
--- | 3  | 3   |
--- +----+-----+
+-- +----------+
+-- | tiv_2016 |
+-- +----------+
+-- | 45.00    |
+-- +----------+
 -- Explanation: 
--- The person with id 3 is a friend of people 1, 2, and 4, so he has three friends in total, which is the most number than any others.
- 
+-- The first record in the table, like the last record, meets both of the two criteria.
+-- The tiv_2015 value 10 is the same as the third and fourth records, and its location is unique.
 
--- Follow up: In the real world, multiple people could have the same most number of friends. Could you find all these people in this case?
+-- The second record does not meet any of the two criteria. Its tiv_2015 is not like any other policyholders and its location is the same as the third record, which makes the third record fail, too.
+-- So, the result is the sum of tiv_2016 of the first and last record, which is 45.
 
-# Write your MySQL query statement below
-
-WITH CTE AS (
-    SELECT
-        DISTINCT(requester_id) AS re_id,
-        accepter_id
-    FROM RequestAccepted
-
-    UNION
-
-    SELECT
-        DISTINCT(accepter_id) AS ac_id,
-        requester_id
-    FROM RequestAccepted
+SELECT ROUND(SUM(tiv_2016),2) AS tiv_2016
+FROM insurance
+WHERE tiv_2015 IN (
+    SELECT tiv_2015
+    FROM insurance
+    GROUP BY tiv_2015
+    HAVING COUNT(tiv_2015) >= 2
+) AND (lat, lon) IN (
+    SELECT lat, lon
+    FROM insurance
+    GROUP BY lat, lon
+    HAVING COUNT(*) = 1
 )
-
-SELECT 
-    re_id AS id,
-    COUNT(accepter_id) AS num
-FROM CTE
-GROUP BY re_id
-ORDER BY num DESC
-LIMIT 1
