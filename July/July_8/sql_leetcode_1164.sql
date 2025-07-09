@@ -1,103 +1,84 @@
--- -- 1045. Customers Who Bought All Products
--- -- Solved
--- -- Medium
--- -- Topics
--- -- premium lock icon
--- -- Companies
--- -- SQL Schema
--- -- Pandas Schema
--- -- Table: Customer
+-- 1204. Last Person to Fit in the Bus
+-- Solved
+-- Medium
+-- Topics
+-- premium lock icon
+-- Companies
+-- SQL Schema
+-- Pandas Schema
+-- Table: Queue
 
--- -- +-------------+---------+
--- -- | Column Name | Type    |
--- -- +-------------+---------+
--- -- | customer_id | int     |
--- -- | product_key | int     |
--- -- +-------------+---------+
--- -- This table may contain duplicates rows. 
--- -- customer_id is not NULL.
--- -- product_key is a foreign key (reference column) to Product table.
+-- +-------------+---------+
+-- | Column Name | Type    |
+-- +-------------+---------+
+-- | person_id   | int     |
+-- | person_name | varchar |
+-- | weight      | int     |
+-- | turn        | int     |
+-- +-------------+---------+
+-- person_id column contains unique values.
+-- This table has the information about all people waiting for a bus.
+-- The person_id and turn columns will contain all numbers from 1 to n, where n is the number of rows in the table.
+-- turn determines the order of which the people will board the bus, where turn=1 denotes the first person to board and turn=n denotes the last person to board.
+-- weight is the weight of the person in kilograms.
  
 
--- -- Table: Product
+-- There is a queue of people waiting to board a bus. However, the bus has a weight limit of 1000 kilograms, so there may be some people who cannot board.
 
--- -- +-------------+---------+
--- -- | Column Name | Type    |
--- -- +-------------+---------+
--- -- | product_key | int     |
--- -- +-------------+---------+
--- -- product_key is the primary key (column with unique values) for this table.
- 
+-- Write a solution to find the person_name of the last person that can fit on the bus without exceeding the weight limit. The test cases are generated such that the first person does not exceed the weight limit.
 
--- -- Write a solution to report the customer ids from the Customer table that bought all the products in the Product table.
+-- Note that only one person can board the bus at any given turn.
 
--- -- Return the result table in any order.
-
--- -- The result format is in the following example.
+-- The result format is in the following example.
 
  
 
--- -- Example 1:
+-- Example 1:
 
--- -- Input: 
--- -- Customer table:
--- -- +-------------+-------------+
--- -- | customer_id | product_key |
--- -- +-------------+-------------+
--- -- | 1           | 5           |
--- -- | 2           | 6           |
--- -- | 3           | 5           |
--- -- | 3           | 6           |
--- -- | 1           | 6           |
--- -- +-------------+-------------+
--- -- Product table:
--- -- +-------------+
--- -- | product_key |
--- -- +-------------+
--- -- | 5           |
--- -- | 6           |
--- -- +-------------+
--- -- Output: 
--- -- +-------------+
--- -- | customer_id |
--- -- +-------------+
--- -- | 1           |
--- -- | 3           |
--- -- +-------------+
--- -- Explanation: 
--- -- The customers who bought all the products (5 and 6) are customers with IDs 1 and 3.
+-- Input: 
+-- Queue table:
+-- +-----------+-------------+--------+------+
+-- | person_id | person_name | weight | turn |
+-- +-----------+-------------+--------+------+
+-- | 5         | Alice       | 250    | 1    |
+-- | 4         | Bob         | 175    | 5    |
+-- | 3         | Alex        | 350    | 2    |
+-- | 6         | John Cena   | 400    | 3    |
+-- | 1         | Winston     | 500    | 6    |
+-- | 2         | Marie       | 200    | 4    |
+-- +-----------+-------------+--------+------+
+-- Output: 
+-- +-------------+
+-- | person_name |
+-- +-------------+
+-- | John Cena   |
+-- +-------------+
+-- Explanation: The folowing table is ordered by the turn for simplicity.
+-- +------+----+-----------+--------+--------------+
+-- | Turn | ID | Name      | Weight | Total Weight |
+-- +------+----+-----------+--------+--------------+
+-- | 1    | 5  | Alice     | 250    | 250          |
+-- | 2    | 3  | Alex      | 350    | 600          |
+-- | 3    | 6  | John Cena | 400    | 1000         | (last person to board)
+-- | 4    | 2  | Marie     | 200    | 1200         | (cannot board)
+-- | 5    | 4  | Bob       | 175    | ___          |
+-- | 6    | 1  | Winston   | 500    | ___          |
+-- +------+----+-----------+--------+--------------+
 
--- # Write your MySQL query statement below
--- SELECT
---     customer_id
--- FROM customer c
--- GROUP BY customer_id
--- HAVING COUNT(DISTINCT product_key) = (SELECT COUNT(*) FROM product)
-
--- # Write your MySQL query statement below
+# Write your MySQL query statement below
 WITH CTE AS(
-    SELECT
-        product_id,
-        MAX(change_date) AS sol_date
-    FROM products
-    WHERE change_date <= "2019-08-16"
-    GROUP BY product_id
+    SELECT 
+        person_name, person_id, turn,
+        SUM(weight) OVER(ORDER BY turn) AS total_weight
+    FROM queue
 )
 
-SELECT
-    p.product_id, 
-    CASE WHEN new_price IS NULL THEN 10 ELSE new_price END AS price
-FROM products p
-INNER JOIN CTE c ON p.change_date = c.sol_date AND p.product_id = c.product_id
-
-UNION
-
-SELECT
-    DISTINCT product_id,
-    10 AS price
-FROM products
-WHERE product_id NOT IN(
-    SELECT product_id
-    FROM products
-    WHERE change_date <= "2019-08-16"
+SELECT 
+    person_name
+FROM CTE
+WHERE turn = (
+    SELECT 
+        MAX(turn)
+    FROM CTE
+    WHERE total_weight <= 1000
 )
