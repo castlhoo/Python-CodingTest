@@ -31,13 +31,19 @@ for i in range(9):
     row_counter = Counter(box[i])
     for x in row_counter:
         if row_counter[x] > 1:
-            print("NO")
+            is_valied = False
+            break
+    if not is_valied:
+        break
     
 for j in range(9):
     col_counter = Counter(box[k][j] for k in range(9))
     for x in col_counter:
         if col_counter[x] > 1:
-            print("NO")
+            is_valied = False
+            break
+    if not is_valied:
+        break
 
 for box_row in range(3):
     for box_col in range(3):
@@ -51,6 +57,12 @@ for box_row in range(3):
         box_counter = Counter(box_elements)
         for x in box_counter:
             if box_counter[x] > 1:
-                print("NO")
+                is_valied = False
+                break
+        if not is_valied:
+            break
 
-print("YES")
+if is_valied:
+    print("YES")
+else:
+    print("NO")
