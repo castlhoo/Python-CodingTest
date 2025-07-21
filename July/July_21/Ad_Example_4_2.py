@@ -21,3 +21,25 @@
 # 457
 # 539
 
+n, k = map(int, input().split())
+length = []
+for _ in range(n):
+    length.append(int(input()))
+left = 1
+right = max(length)
+answer = 0
+
+while left <= right:
+    mid = (left + right)//2
+    count = 0
+    
+    for i in length:
+        count += i//mid
+
+    if count >= k:
+        answer = mid
+        left = mid + 1
+    else:
+        right = mid - 1
+
+print(answer)
