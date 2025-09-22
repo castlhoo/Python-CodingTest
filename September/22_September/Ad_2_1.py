@@ -22,10 +22,13 @@
 # 3
 
 n, k = map(int, input().split())
-divisor = list()
+count = 0
 
 for i in range(1, n+1):
     if n % i == 0:
-        divisor.append(i)
-
-print(divisor[k-1])
+        count += 1
+        if count == k:
+            print(i)
+            break
+else:
+    print(-1)
