@@ -2,7 +2,7 @@ import numpy as np
 import random
 
 def k_means(k, i, points):
-    # 1. k-means++ 초기화
+    # k-means++
     centroids = [random.choice(points)]
 
     for _ in range(1, k):
@@ -29,7 +29,7 @@ def k_means(k, i, points):
                 centroids.append(point)
                 break
 
-    # 2. 일반 k-means 반복
+    # k-means
     for _ in range(i):
         clusters = [[] for _ in range(k)]
 
